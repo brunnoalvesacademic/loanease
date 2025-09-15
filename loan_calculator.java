@@ -263,8 +263,9 @@ public class LoanCalculator {
                 // APR divided by 365 per day, then compounded into chosen frequency
                 BigDecimal daily = apr.divide(new BigDecimal("365"), 20, RoundingMode.HALF_UP);
                 BigDecimal onePlusDaily = BigDecimal.ONE.add(daily, mc);
-                BigDecimal effPer = pow(onePlusDaily, new BigDecimal("365.0").divide(new BigDecimal(periodsPerYear), 10, RoundingMode.HALF_UP), mc)
-                        .subtract(BigDecimal.ONE, mc);
+                // Use double exponent to avoid BigDecimal exponent mismatch in pow()
+                double exp = 365.0 / periodsPerYear;
+                BigDecimal effPer = pow(onePlusDaily, exp, mc).subtract(BigDecimal.ONE, mc);
                 return effPer;
             }
             case EFFECTIVE_ANNUAL: {
